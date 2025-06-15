@@ -23,7 +23,7 @@ jobs:
           echo "${{ github.event.issue.body }}" > hello.txt
           git add hello.txt
           git commit -m "Update hello.txt from issue #${{ github.event.issue.number }}"
-          git push origin main
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
       - name: Close issue
         uses: peter-evans/close-issue@v2
