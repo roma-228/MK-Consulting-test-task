@@ -29,7 +29,7 @@ jobs:
       - name: Generate Ansible inventory file
         run: |
           mkdir -p ansible
-          echo "[web]" > ansible/inventory.ini
+          echo "[webservers]" > ansible/inventory.ini
           echo "${{ secrets.DEPLOY_HOST }} ansible_user=${{ secrets.DEPLOY_USER }} ansible_ssh_private_key_file=../deploy_key.pem ansible_port=22 ansible_ssh_common_args='-o IdentitiesOnly=yes'" >> ansible/inventory.ini
 
       - name: Run Ansible Playbook
