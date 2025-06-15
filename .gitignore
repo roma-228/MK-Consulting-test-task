@@ -1,0 +1,6 @@
+ansible/inventory.ini
+terraform/deployer_key.pem
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl

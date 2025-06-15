@@ -1,0 +1,48 @@
+name: Deploy Static Website with Ansible
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python and install Ansible
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install ansible
+
+      - name: Write private key to file
+        run: |
+          echo "${{ secrets.SSH_DEPLOY_KEY }}" > deploy_key.pem
+          chmod 600 deploy_key.pem
+
+      - name: Generate inventory
+        run: |
+          echo "[web]" > ansible/inventory.ini
+          echo "${{ secrets.DEPLOY_HOST }} ansible_user=${{ secrets.DEPLOY_USER }} ansible_ssh_private_key_file=../deploy_key.pem ansible_port=22 ansible_ssh_common_args='-o IdentitiesOnly=yes'" >> ansible/inventory.ini
+
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook ansible/deploy_website.yml -i ansible/inventory.ini
+
+      - name: Verify deployed content via curl
+        run: |
+          sleep 10
+          DEPLOYED_CONTENT=$(curl -s http://${{ secrets.DEPLOY_HOST }})
+          LOCAL_CONTENT=$(cat hello.txt)
+          if [ "$DEPLOYED_CONTENT" != "$LOCAL_CONTENT" ]; then
+            echo "Deployed content does not match hello.txt"
+            echo "Received: $DEPLOYED_CONTENT"
+            echo "Expected: $LOCAL_CONTENT"
+            exit 1
+          else
+            echo "Website content verified successfully"
