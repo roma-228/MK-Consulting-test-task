@@ -32,3 +32,10 @@ jobs:
           comment: |
             `hello.txt` was updated and committed.
             The CI/CD pipeline is now running.
+
+      - name: Trigger Deploy Workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Deploy Static Website with Ansible
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
